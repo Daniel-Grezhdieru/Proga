@@ -1,0 +1,215 @@
+#include <stdio.h> 
+#include <iostream> 
+using namespace std;
+#pragma once
+#define NULL 0
+/*СПИСОК*/
+//собственно сам список
+class List
+{
+	class Node //здесь будет лежать значение элемента и адрес следующего
+	{
+	public: //конструктор
+		int _value; //значение
+		Node* _next; //ссылка-адрес
+
+		Node(int value) //конструктор
+		{
+			_value = value;
+			_next = NULL;
+		}
+
+		Node() //конструктор
+		{
+			_value = 0;
+			_next = NULL;
+		}
+	};
+
+private: 
+	Node* _head; //первый элемент (внизу)
+	Node* _last; //последний элемент (вверху)
+	int _count; //количество элементиков 
+public:
+	int Count() //дабы извне не смогли поменять количество
+	{
+		return _count;
+	}
+	//метод добавления 
+	void Add(int value)
+	{
+		Node* temp = new Node(value);
+		if (_last != NULL) //если последний есть
+		{
+			_last->_next = temp; //меняем адрес последнего
+			_last = temp;
+		}
+		else //если список пуст
+		{
+			_head = temp; 
+			_last = _head; //последний = первый
+		}
+		_count++; //увеличиваем количество элементов
+	}
+	//метод вставки
+	void Insert(int index, int value)
+	{
+		Node *temp = new Node(value);
+		if (index == 0) //если вставляют в самое начало
+		{
+			temp->_next = _head; //запоминаем ссылочку на первый
+			_head = temp;
+		}
+		else if (index == _count - 1)
+		{
+			_last->_next = temp;
+			_last = temp;
+		}
+		else //если вставка где-то в другом месте
+		{
+			Node *pred = NULL;
+			Node *current = _head;
+			for (int i = 0; i <= index; i++) //бежим до нашего места вставки
+			{
+				pred = current; //предыдущий=текущий
+				current = current->_next; //текущий=ссылка на следующий
+			}
+			pred->_next = temp; //добавляем элемент
+			temp->_next = current;
+		}
+		_count++; //увеличиваем количество элементов
+	}
+	//метод удаления по значению
+	void Remove(int item)
+	{
+		Node *pred = NULL;
+		Node *current = _head;
+		while (current != NULL) //пока текущий есть
+		{
+			if (current->_value == item) //если текущее значение совпадает с выбранным
+			{
+				if (pred == NULL) //если предыдущего нет
+				{
+					_head = current->_next;
+				}
+				else //если предыдущий есть
+				{
+					pred->_next = current->_next; //замена ссылок
+				}
+				if (current->_next == NULL) //если следующего значения нет
+				{
+					_last = pred; //последний=предыдущий
+				}
+				_count--; //уменьшаем количество элементов
+				current = NULL;
+				return;
+			}
+			pred = current; //предыдущий=текущий
+			current = current->_next; //текущий=ссылка на следующий
+		}
+	}
+	//метод по извлечению значения элемента с данным номером
+	int GetValue(int index) 
+	{
+		if (index == _count - 1) //если нужно значение последнего элемента
+		{
+			return _last->_value;
+		}
+		Node* current = _head;
+		for (int i = 0; i < index; i++) //бежим до нашего элемента
+		{
+			current = current->_next;
+		}
+		return current->_value; //возвращаем значение
+	}
+	//метод подтверждения нахождения указанного элемента в списке 
+	bool Contains(int item)
+	{
+		Node *current = _head;
+		while (current != NULL) //пока весь список не пробежим
+		{
+			if (current->_value == item) //если элемент нашёлся
+			{
+				return true; 
+			}
+			current = current->_next;
+		}
+		return false; //если не нашёлся
+	}
+	//метод удаления по индексу
+	void RemoveAt(int index)
+	{
+		Node *pred = NULL; 
+		Node *current = _head;
+		if (index == 0) //если нужен первый элемент
+		{
+			pred = _head;
+			_head = _head->_next;
+			pred = NULL; //удаляем из списка
+		}
+		else //иначе
+		{
+			for (int i = 0; i < index; i++) //бежим до нашего элементика
+			{
+				pred = current;
+				current = current->_next;
+			}
+			if (current->_next == NULL) //если следующего нет
+			{
+				_last = pred; //меняем
+			}
+			else //иначе
+			{
+				pred->_next = current->_next; //тоже меняем
+			}
+			current = NULL; //текущий обнуляем
+		}
+		_count--; //уменьшаем количество элементов
+	}
+
+	void Clear()
+	{
+		Node *current = _head;
+		Node *pred = NULL;
+		while (current->_next != NULL)
+		{
+			pred = current;
+			current = current->_next;
+			pred = NULL;
+		}
+		current = NULL;
+	}
+
+	void Print()
+	{
+		Node *current = _head;
+		for (int i = 0; i < _count; i++)
+		{
+			cout << current->_value << " ";
+			current = current->_next;
+		}
+		cout << endl;
+		return;
+	}
+
+	List() //конструктор
+	{
+		_head = NULL;
+		_last = NULL;
+		_count = 0;
+	}
+
+	~List() //деструктор
+	{
+		Node *current = _head;
+		Node *pred = NULL;
+		while (current->_next != NULL)
+		{
+			pred = current;
+			current = current->_next;
+			delete pred;
+		}
+		delete current;
+		delete this;
+	}
+};

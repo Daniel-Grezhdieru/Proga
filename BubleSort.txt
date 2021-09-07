@@ -1,0 +1,22 @@
+int tmp;//для сортировки
+	int k=0;//счётчик сравнений
+	int c=0;//счётчик присваиваний 
+	for (int i = 0; i < N - 1; i++)
+	{
+		for (int j = 0; j < N - 1 - i; j++)
+		{
+			if (mas[j] > mas[j + 1])
+			{
+				tmp = mas[j];
+				mas[j] = mas[j + 1];
+				mas[j + 1] = tmp;
+				c = c + 3;
+			}
+			k++;
+		}
+	}
+	printf("%d %d\n", k, c);
+	for (int i = 0; i < N; i++)
+	{
+		mas[i] = massort[i];
+	}

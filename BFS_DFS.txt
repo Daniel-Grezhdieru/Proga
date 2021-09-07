@@ -1,0 +1,197 @@
+#include <iostream>
+#include <fstream>
+#include <queue>
+#include <vector>
+#include <stack>
+#include <map>
+#include <unordered_map>
+
+#define MAX 100001
+
+using namespace std;
+
+ifstream fin("input.txt");
+
+int n, m;
+
+vector<int> graph[MAX];
+int current_way[MAX] = { 0 };
+
+vector<pair<int, int>> graph1[MAX];
+pair<int, int> current_way1[MAX];
+
+//поиск в глубину
+void DFS()
+{
+	current_way[1] = -1;
+	stack<int> incidenceVertices;
+	bool visited[MAX] = { false };
+	incidenceVertices.push(1);
+	visited[1] = true;
+	while (!incidenceVertices.empty())
+	{
+		int current = incidenceVertices.top();
+		incidenceVertices.pop();
+		int size = graph[current].size();
+		for (int i = 0; i < size; i++)
+		{
+			int neighbour = graph[current][i];
+			if (!visited[neighbour])
+			{
+				incidenceVertices.push(neighbour);
+				visited[neighbour] = true;
+				current_way[neighbour] = current;
+			}
+		}
+	}
+}
+
+//поиск в ширину
+void BFS()
+{
+	bool used[MAX] = { false };
+	queue<int> q;
+	q.push(1);
+	used[1] = true;
+	current_way[1] = -1;
+	while (!q.empty())
+	{
+		int current_list = q.front();
+		q.pop();
+		size_t size = graph[current_list].size();
+		for (size_t i = 0; i < size; ++i)
+		{
+			int current_neighbour = graph[current_list][i];
+			if (!used[current_neighbour])
+			{
+				used[current_neighbour] = true;
+				q.push(current_neighbour);
+				current_way[current_neighbour] = current_list;
+			}
+		}
+	}
+}
+
+//поиск в глубину рекурсией (1)
+void RecursiveDFS(int start, bool *visited)
+{
+	int size = graph[start].size();
+	for (int i = 0; i < size; i++)
+	{
+		int neighbour = graph[start][i];
+		if (!visited[neighbour])
+		{
+			visited[neighbour] = true;
+			current_way[neighbour] = start;
+			RecursiveDFS(neighbour, visited);
+		}
+	}
+}
+
+vector<int> SearchPath(int start, int stop, int*way)
+{
+	vector<int>path_stop_to_start;
+	int parent_vertex = stop;
+	do
+	{
+		path_stop_to_start.push_back(parent_vertex);
+		parent_vertex = way[parent_vertex];
+	} while (parent_vertex != -1 && parent_vertex != start);
+	if (parent_vertex != start)
+	{
+		vector<int>path_start_to_stop = SearchPath(1, start, way);
+		path_start_to_stop.pop_back();
+		while (!path_start_to_stop.empty())
+		{
+			path_stop_to_start.push_back(path_start_to_stop.back());
+			path_start_to_stop.pop_back();
+		}
+	}
+	else
+	{
+		path_stop_to_start.push_back(start);
+	}
+	return path_stop_to_start;
+}
+
+//поиск в глубину рекурсией (2)
+void RecursiveDFS1(int start, bool *visited)
+{
+	int size = graph1[start].size();
+	for (int i = 0; i < size; i++)
+	{
+		pair<int, int> neighbour = graph1[start][i];
+		if (!visited[neighbour.first])
+		{
+			visited[neighbour.first] = true;
+			current_way1[neighbour.first] = make_pair(start, neighbour.second);
+			RecursiveDFS1(neighbour.first, visited);
+		}
+	}
+}
+
+int SearchPath1(int start, int stop, pair<int, int>*way)
+{
+	int sum = 0;
+	int parent_vertex = stop;
+	do
+	{
+		sum = sum^way[parent_vertex].second;
+		parent_vertex = way[parent_vertex].first;
+	} while (parent_vertex != -1 && parent_vertex != start);
+	if (parent_vertex != start)
+	{
+		sum = sum^SearchPath1(1, start, way);
+	}
+	return sum;
+}
+
+int main()
+{
+	fin >> n >> m;
+	//map<pair<int, int>, int> matrix;
+	for (int i = 0; i < n - 1; i++)
+	{
+		int u, v;
+		int b;
+		fin >> u >> v >> b;
+		graph[u].push_back(v);
+		graph[v].push_back(u);
+		graph1[u].push_back(make_pair(v, b));
+		graph1[v].push_back(make_pair(u, b));
+		//pair<int, int>edge = make_pair(u, v);
+		//matrix.insert(make_pair(edge, b));
+		//matrix[make_pair(u, v)] = b;
+	}
+	//DFS();
+	current_way[1] = -1;
+	current_way1[1] = make_pair(-1, 0);
+	bool visited[MAX] = { false };
+	visited[1] = true;
+	RecursiveDFS1(1, visited);
+	for (int i = 0; i < m; i++)
+	{
+		int u, v;
+		fin >> u >> v;
+		//vector<int> distance = SearchPath(u, v, current_way);
+		int answer = SearchPath1(u, v, current_way1);
+		//pair<int, int>edge;
+		//int size = distance.size();
+		//while (size > 1)
+		//{
+		//	u = distance.front();
+		//	v = distance[1];
+		//	if (u < v)
+		//	{
+		//		swap(u, v);
+		//	}
+		//	edge = make_pair(u, v);
+		//	answer = answer^matrix[edge];
+		//	//answer = answer^matrix[u - 1][v - 1];
+		//	distance.erase(distance.begin() + 0);
+		//	size--;
+		//}
+		cout << answer << endl;
+	}
+	return 0;
+}

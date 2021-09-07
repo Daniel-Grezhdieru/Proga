@@ -1,0 +1,76 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+	ifstream fin("input.txt");
+	const int N = 1000001;
+	vector<bool>prime(N, true);
+	for (int i = 2; i * i <= N; ++i)
+	{
+		if (prime[i] == true)
+		{
+			for (int j = i * i; j < N; j += i)
+			{
+				prime[j] = false;
+			}
+		}
+	}
+	int count;
+	fin >> count;
+	for (int i = 0; i < count; i++)
+	{
+		int input;
+		fin >> input;
+		if (prime[input] == true)
+		{
+			cout << 1 << " " << input << endl;
+			continue;
+		}
+		vector<int> answer;
+		int remainder;
+		if (input % 2 != 0)
+		{
+			if (prime[input - 2] == true)
+			{
+				answer.push_back(2);
+				answer.push_back(input - 2);
+				cout << answer.size() << " ";
+				for (int j = 0; j < answer.size(); j++)
+				{
+					cout << answer[j] << " ";
+				}
+				cout << endl;
+				continue;
+			}
+			else
+			{
+				input -= 3;
+				answer.push_back(3);
+			}
+		}
+		for (int j = 2; j <= N; j++)
+		{
+			if (prime[j] == true)
+			{
+				remainder = input - j;
+				if (prime[remainder] == true)
+				{
+					answer.push_back(j);
+					answer.push_back(remainder);
+					break;
+				}
+			}
+		}
+		cout << answer.size() << " ";
+		for (int j = 0; j < answer.size(); j++)
+		{
+			cout << answer[j] << " ";
+		}
+		cout << endl;
+	}
+	return 0;
+}

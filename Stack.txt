@@ -1,0 +1,88 @@
+class Stack
+{
+	class Node //здесь будет лежать значение элемента и адрес следующего
+	{
+	public: //конструктор
+		int _value; //значение
+		Node* _next; //ссылка-адрес
+
+		Node(int value) //конструктор
+		{
+			_value = value;
+			_next = NULL;
+		}
+
+		Node() //конструктор
+		{
+			_value = 0;
+			_next = NULL;
+		}
+	};
+
+private:
+	Node* _head; //первый элемент (внизу)
+	Node* _last; //последний элемент (вверху)
+	int _count; //количество элементиков 
+public:
+	int Count() //дабы извне не смогли поменять количество
+	{
+		return _count;
+	}
+	//метод вставки
+	void Push(int value)
+	{
+		Node *temp = new Node(value);
+		temp->_next = _head; //запоминаем ссылочку на первый
+		_head = temp;
+		_count++; //увеличиваем количество элементов
+	}
+	//метод по извлечению значения первого элемента 
+	int Top()
+	{
+		Node* current = _head;
+		return current->_value; //возвращаем значение
+	}
+	//метод по удалению первого элемента
+	void Pop()
+	{
+		Node *pred = NULL;
+		Node *current = _head;
+		pred = _head;
+		_head = _head->_next;
+		pred = NULL; //удаляем из списка
+		_count--; //уменьшаем количество элементов
+	}
+	//метод по выводу на экран массивчика
+	void Print()
+	{
+		Node *current = _head;
+		for (int i = 0; i < _count; i++)
+		{
+			cout << current->_value << " ";
+			current = current->_next;
+		}
+		cout << endl;
+		return;
+	}
+
+	Stack() //конструктор
+	{
+		_head = NULL;
+		_last = NULL;
+		_count = 0;
+	}
+
+	~Stack() //деструктор
+	{
+		Node *current = _head;
+		Node *pred = NULL;
+		while (current->_next != NULL)
+		{
+			pred = current;
+			current = current->_next;
+			pred = NULL;
+		}
+		current = NULL;
+		delete this;
+	}
+};

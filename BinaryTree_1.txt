@@ -1,0 +1,167 @@
+#include <fstream> 
+#include <stdio.h> 
+#include <iostream> 
+#include <cmath> 
+#include <string>
+using namespace std;
+
+template <typename T>
+struct Node
+{
+	Node <T>* parent;
+	T info;
+	Node <T>* left;
+	Node <T>* right;
+};
+template <typename T>
+struct BinaryTree
+{
+	Node <T>* root;
+
+	void Init()
+	{
+		root = NULL;
+	}
+
+	Node <T>* NewNode(const T&value)
+	{
+		Node <T>* tmp = new Node <T>;
+		tmp->info = value;
+		tmp->parent = NULL;
+		tmp->left = NULL;
+		tmp->right = NULL;
+		return tmp;
+	}
+
+	bool AddNode(const T&value)
+	{
+		if (root == NULL) //если дерево пустое
+		{
+			root = NewNode(value); //создаЄм новый узел = корень дерева
+			return true; //вставили
+		}
+		Node <T>*tmp = root;
+		while (tmp != NULL) //пока не прошли всю ветвь дерева
+		{
+			if (tmp->info == value) //если хот€т вставить уже имеющийс€ элемент
+			{
+				return false; //не вставили
+			}
+			if (tmp->info > value) //если вставл€емый элемент ћ≈Ќ№Ў≈ текущего узла
+			{
+				if (tmp->left == NULL) //если нет левого сына
+				{
+					tmp->left = NewNode(value); //создаЄм новый узел
+					tmp->left->parent = tmp; //устанавливаем св€зь с родителем
+					return true; //вставили
+				}
+				else //если есть левый сын
+				{
+					tmp = tmp->left; //рассматриваем этого сына
+				}
+			}
+			else //если вставл€емый элемент ЅќЋ№Ў≈ текущего узла
+			{
+				if (tmp->right == NULL) //если нет правого сына
+				{
+					tmp->right = NewNode(value); //создаЄм новый узел
+					tmp->right->parent = tmp; //устанавливаем св€зь с родителем
+					return true; //вставили
+				}
+				else //если есть правый сын
+				{
+					tmp = tmp->right; //рассматриваем этого сына
+				}
+			}
+		}
+	}
+
+	void Print_Max_And_Delete_It()
+	{
+		if (root != NULL) //если дерево не пустое
+		{
+			Node <T>*tmp = root; //начинаем с вершины
+			if (root->right != NULL) //если у корн€ есть правый сын
+			{
+				while (tmp->right != NULL) //пока есть правый сын 
+				{
+					tmp = tmp->right; //перемещаемс€ вниз-вправо
+				}
+				cout << tmp->info << endl; //выводим наибольший элемент - самого правого сына
+				if (tmp->left != NULL) //если у найденного наибольшего элемента есть левый сын
+				{
+					Node <T>*temp = NULL;
+					temp = tmp;
+					temp->parent->right = tmp->left; //родителем левого сына текущего максимума становитс€ родитель этого максимума
+					temp->left->parent = tmp->parent; //устанавливаетс€ двусторонн€€ св€зь
+					tmp = temp->left; //переставл€ем левого сына (и всю следующую за ним цепочку) на место максимума
+					temp = NULL; //очищаем пам€ть из-под левого сына
+				}
+				else //если у найденного наибольшего элемента нет сыновей
+				{
+					tmp->parent->right = NULL; //наибольший элемент забывает своего отца
+					tmp = NULL; //уничтожаем наибольший элемент (звучит жестоко)
+				}
+			}
+			else //если у корн€ нет правого сына
+			{
+				cout << root->info << endl; //выводим наибольший элемент - корень
+				if (root->left != NULL) //если у корн€ есть левый сын
+				{
+					Node <T>*temp = NULL;
+					temp = root;
+					temp->left->parent = root->parent; //родителем левого сына корн€ становитс€ NULL
+					root = temp->left; //переставл€ем левого сына (и всю следующую за ним цепочку) на место корн€
+					temp = NULL; //очищаем пам€ть из-под корн€
+				}
+				else //если всЄ дерево = корень
+				{
+					root = NULL; //уничтожаем корень
+				}
+			}
+		}
+	}
+
+	void PrintSym(Node <T>*tmp)
+	{
+		if (tmp != NULL)
+		{
+			PrintSym(tmp->left);
+			cout << tmp->info << " ";
+			PrintSym(tmp->right);
+		}
+	}
+
+	void PrintSymTree()
+	{
+		PrintSym(root);
+	}
+
+};
+int main()
+{
+	ifstream fin("input.txt");
+	ofstream fout("output.txt");
+	BinaryTree <long long> tree;
+	tree.Init();
+	char input[11] = "";
+	long long N;
+	fin >> N;
+	long long number;
+	for (long long i = 0; i < N; i++)
+	{
+		fin >> input;
+		if (input[0] == 'I' && input[1] == 'n' && input[2] == 's' && input[3] == 'e'&& input[4] == 'r'&& input[5] == 't')
+		{
+			fin >> number;
+			tree.AddNode(number);
+		}
+		if (input[0] == 'E' && input[1] == 'x' && input[2] == 't'&& input[3] == 'r'&& input[4] == 'a'&& input[5] == 'c'&& input[6] == 't'&& input[7] == 'M'&& input[8] == 'a'&& input[9] == 'x')
+		{
+			tree.Print_Max_And_Delete_It();
+		}
+	}
+	fin.close();
+	fout.close();
+	return 0;
+}

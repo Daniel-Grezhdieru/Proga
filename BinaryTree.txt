@@ -1,0 +1,141 @@
+#include <fstream> 
+#include <stdio.h> 
+#include <iostream> 
+#include <cmath> 
+
+using namespace std;
+
+template <typename T>
+struct Node
+{
+	T value;
+	Node <T>* left;
+	Node <T>* right;
+};
+
+template <typename T>
+struct BinaryTree
+{
+	Node <T>* root;
+
+	void Init()
+	{
+		root = NULL;
+	}
+
+	Node <T>* NewNode(const T&value) 
+	{
+		Node <T>* tmp = new Node <T>;
+		tmp->value = value;
+		tmp->left = NULL;
+		tmp->right = NULL;
+		return tmp;
+	}
+
+	void AddNode(const T & parent, const T & value)
+	{
+		if (root==NULL)
+		{
+			root = NewNode(parent);
+			root->left = NewNode(value);
+			root->right = NULL;
+		}
+		else
+		{
+			Node <T>*tmp = new Node <T>;
+			tmp->value = value;
+			if (parent == -1)
+			{
+				tmp->left = root;
+				tmp->right = NULL;
+				root = tmp;
+			}
+			else
+			{
+				RecursionInsert(parent, value, root);
+			}
+		}
+	}
+
+	bool RecursionInsert(const T & parent, const T & value, Node <T>*current)
+	{
+		if (current->value == parent)
+		{
+			if (current->left == NULL)
+			{
+				current->left = NewNode(value);
+				return true;
+			}
+			if (current->right == NULL)
+			{
+				current->right = NewNode(value);
+				return true;
+			}
+		}
+		else
+		{
+			bool flag = false;
+			if (current->left != NULL)
+			{
+				flag = RecursionInsert(parent, value, current->left);
+			}
+			if (current->right!=NULL && !flag)
+			{
+				flag = RecursionInsert(parent, value, current->right);
+			}
+			return flag;
+		}
+	}
+	
+	int HeightOfTree(Node <T>*tmp)
+	{
+		if (tmp == NULL)
+		{
+			return 0;
+		}
+		int left_length;
+		int right_length;
+		if (tmp->left != NULL)
+		{
+			left_length = HeightOfTree(tmp->left);
+		}
+		else
+		{
+			left_length = 0;
+		}
+		if (tmp->right != NULL) 
+		{
+			right_length = HeightOfTree(tmp->right);
+		}
+		else
+		{
+			right_length = 0;
+		}
+		int max_length = left_length + 1;
+		if (left_length < right_length)
+		{
+			max_length = right_length + 1;
+		}
+		return (max_length);
+	}
+};
+
+int main()
+{
+	ifstream fin("input.txt");
+	ofstream fout("output.txt");
+	BinaryTree <int> tree;
+	tree.Init();
+	int N;
+	fin >> N;
+	int temp;
+	for (int i = 0; i < N; i++)
+	{
+		fin >> temp;
+		tree.AddNode(temp, i);
+	}
+	cout << endl << tree.HeightOfTree(tree.root) << endl;
+	fin.close();
+	fout.close();
+	return 0;
+}

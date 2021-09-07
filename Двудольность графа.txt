@@ -1,0 +1,103 @@
+#include <cstdio>
+#include <vector>
+#include <queue>
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#define MAX 1000000
+
+unsigned long long int numberVertex, numberEdges;
+unsigned long long int particion[MAX], visited[MAX];
+vector<unsigned long long int> adjacencyMatrix[MAX];
+
+ifstream fin("input.txt");
+
+bool bfs(unsigned long long int begin)
+{
+	unsigned long long int i, origin, destination;
+	queue<unsigned long long int> queueVertex;
+	queueVertex.push(begin);
+	particion[begin] = 1; // 1 left,
+	visited[begin] = 1; // set adjacencyMatrixray
+
+	while (!queueVertex.empty())
+	{
+		origin = queueVertex.front(); 
+		queueVertex.pop();
+		for (i = 0; i < adjacencyMatrix[origin].size(); i++)
+		{
+			destination = adjacencyMatrix[origin][i];
+			if (particion[origin] == particion[destination])
+			{
+				return false;
+			}
+			if (visited[destination] == 0)
+			{
+				visited[destination] = 1;
+				particion[destination] = 3 - particion[origin]; // alter 1 and 2 subsets
+				queueVertex.push(destination);
+			}
+		}
+	}
+	return true;
+}
+
+bool is_bipartite()
+{
+	for (unsigned long long int i = 0; i < numberVertex; i++)
+	{
+		if (visited[i] == 0 && !bfs(i))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+int main()
+{
+	vector<unsigned long long int>team1;
+	vector<unsigned long long int>team2;
+	unsigned long long int nodeOrigin, nodeDestination;
+	fin >> numberVertex >> numberEdges;
+	for (unsigned long long int i = 0; i < numberEdges; i++)
+	{
+		fin >> nodeOrigin >> nodeDestination;
+		nodeOrigin--;
+		nodeDestination--;
+		adjacencyMatrix[nodeOrigin].push_back(nodeDestination);
+		adjacencyMatrix[nodeDestination].push_back(nodeOrigin);
+	}
+	if (is_bipartite())
+	{
+		for (unsigned long long int j = 0; j < numberVertex; j++)
+		{
+			//cout << j+1 << " " << particion[j] << endl;
+			if (particion[j] == 1)
+			{
+				team1.push_back(j);
+			}
+			else
+			{
+				team2.push_back(j);
+			}
+		}
+		cout << team1.size() << " ";
+		for (unsigned long long int i = 0; i < team1.size(); i++)
+		{
+			cout << team1[i]+1 << " ";
+		}
+		cout << endl << team2.size() << " ";
+		for (unsigned long long int i = 0; i < team2.size(); i++)
+		{
+			cout << team2[i]+1 << " ";
+		}
+	}
+	else
+	{
+		printf("???\n");
+	}
+
+	return 0;
+}

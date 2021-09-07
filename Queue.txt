@@ -1,0 +1,104 @@
+class Queue
+{
+	class Node //здесь будет лежать значение элемента и адрес следующего
+	{
+	public: //конструктор
+		int _value; //значение
+		Node* _next; //ссылка-адрес
+
+		Node(int value) //конструктор
+		{
+			_value = value;
+			_next = NULL;
+		}
+
+		Node() //конструктор
+		{
+			_value = 0;
+			_next = NULL;
+		}
+	};
+
+private:
+	Node* _head; //первый элемент (внизу)
+	Node* _last; //последний элемент (вверху)
+	int _count; //количество элементиков 
+public:
+	int Count() //дабы извне не смогли поменять количество
+	{
+		return _count;
+	}
+	
+	void Enqueue(int value)
+	{
+		Node* temp = new Node(value);
+		if (_last != NULL) //если последний есть
+		{
+			_last->_next = temp; //меняем адрес последнего
+			_last = temp;
+		}
+		else //если список пуст
+		{
+			_head = temp;
+			_last = _head; //последний = первый
+		}
+		_count++; //увеличиваем количество элементов
+	}
+	
+	int GetValue(int index)
+	{
+		if (index == _count - 1) //если нужно значение последнего элемента
+		{
+			return _last->_value;
+		}
+		Node* current = _head;
+		for (int i = 0; i < index; i++) //бежим до нашего элемента
+		{
+			current = current->_next;
+		}
+		return current->_value; //возвращаем значение
+	}
+
+	void Dequeue()
+	{
+		Node *pred = NULL;
+		Node *current = _head;
+		pred = _head;
+		_head = _head->_next;
+		pred = NULL; //удаляем из списка
+		_count--; //уменьшаем количество элементов
+	}
+
+	void Print()
+	{
+		Node *current = _head;
+		for (int i = 0; i < _count; i++)
+		{
+			cout << current->_value << " ";
+			current = current->_next;
+		}
+		cout << endl;
+		return;
+	}
+
+	Queue() //конструктор
+	{
+		_head = NULL;
+		_last = NULL;
+		_count = 0;
+	}
+
+	~Queue() //деструктор
+	{
+		Node *current = _head;
+		Node *pred = NULL;
+		while (current->_next != NULL)
+		{
+			pred = current;
+			current = current->_next;
+			pred = NULL;
+		}
+		current = NULL;
+		delete this;
+	}
+};

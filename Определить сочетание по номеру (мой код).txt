@@ -1,0 +1,52 @@
+#include <iostream>
+#include <fstream>
+#include <math.h>
+#include <vector>
+#include <algorithm>
+using namespace std;
+int main()
+{
+	ifstream fin("input.txt");
+	int n, s;
+	unsigned long long k;
+	fin >> n >> k >> s;
+	vector<char>answer;
+	int coefficient;
+	unsigned long long degree = n;
+	while (answer.size() < n)
+	{
+		coefficient = 1;
+		if (degree > 0)
+		{
+			degree--;
+		}
+		if (degree != 0)
+		{
+			while (coefficient <= s)
+			{
+				if (k <= coefficient*pow(s, degree))
+				{
+					answer.push_back((char)((int)'a' - 1 + coefficient));
+					if (k >= (coefficient - 1)*pow(s, degree))
+					{
+						k = k - (coefficient - 1)*pow(s, degree);
+					}
+					break;
+				}
+				else
+				{
+					coefficient++;
+				}
+			}
+		}
+		else
+		{
+			answer.push_back((char)((int)'a' - 1 + k));
+		}
+	}
+	for (int i = 0; i < answer.size(); i++)
+	{
+		cout << answer[i];
+	}
+	return 0;
+}
